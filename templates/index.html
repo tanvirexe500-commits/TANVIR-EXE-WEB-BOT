@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TANVIR UID BYPASS • ADMIN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --neon: #00f2ff; --bg: #020b14; }
+        body { background: var(--bg); color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(10, 22, 37, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .loader { border: 2px solid rgba(255,255,255,0.1); border-top: 2px solid var(--neon); border-radius: 50%; width: 18px; height: 18px; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+<div id="login-page" class="w-full max-w-md">
+    <div class="glass p-10 rounded-3xl text-center shadow-2xl">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-8 italic">TANVIR EXE</h1>
+        <div class="space-y-4">
+            <input id="username" type="text" placeholder="Admin" class="w-full p-4 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-cyan-500">
+            <input id="password" type="password" placeholder="Password" class="w-full p-4 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-cyan-500">
+            <button id="btn-login" class="w-full py-4 bg-cyan-600 hover:bg-cyan-500 rounded-xl font-bold transition-all">LOGIN</button>
+        </div>
+    </div>
+</div>
+
+<main id="main-dashboard" class="hidden w-full max-w-lg">
+    <div class="glass p-10 rounded-3xl border-cyan-500/20 shadow-2xl">
+        <div class="text-center mb-8">
+            <h2 class="text-2xl font-bold text-cyan-400">TANVIR UID MANAGER</h2>
+            <p class="text-gray-400 text-sm mt-1">Activate Premium Access Instantly</p>
+        </div>
+        
+        <div class="space-y-6">
+            <div>
+                <label class="text-xs text-gray-500 uppercase font-bold mb-2 block">Player UID</label>
+                <input type="text" id="uid-input" placeholder="Enter ID" class="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-cyan-500">
+            </div>
+            <div>
+                <label class="text-xs text-gray-500 uppercase font-bold mb-2 block">Select Expiry</label>
+                <select id="duration-select" class="w-full p-4 bg-white/10 rounded-xl outline-none focus:border-cyan-500 cursor-pointer">
+                    <option value="24">24 Hours (Trial)</option>
+                    <option value="168">7 Days (Weekly)</option>
+                    <option value="360" selected>15 Days (Special)</option>
+                    <option value="720">30 Days (Monthly)</option>
+                </select>
+            </div>
+            <button id="btn-create" class="w-full py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 font-bold rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-cyan-500/20">
+                <span>ACTIVATE UID</span>
+                <div id="add-loader" class="loader hidden"></div>
+            </button>
+            <button onclick="location.reload()" class="w-full text-center text-red-400 text-sm mt-4 hover:underline">Logout</button>
+        </div>
+    </div>
+</main>
+
+<script>
+// Login Logic
+document.getElementById('btn-login').onclick = () => {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    if(user === 'admin' && pass === '1') {
+        document.getElementById('login-page').classList.add('hidden');
+        document.getElementById('main-dashboard').classList.remove('hidden');
+    } else { alert("Access Denied!"); }
+};
+
+// Add UID Logic
+document.getElementById('btn-create').onclick = async () => {
+    const uid = document.getElementById('uid-input').value.trim();
+    const hours = document.getElementById('duration-select').value;
+    if(!uid) return alert("UID দিন!");
+
+    const loader = document.getElementById('add-loader');
+    loader.classList.remove('hidden');
+
+    try {
+        const response = await fetch('/api/sync-uid', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ uid, hours })
+        });
+        const res = await response.json();
+
+        if(res.status === 'success') {
+            alert("✅ TANVIR BYPASS Activated Successfully!");
+            document.getElementById('uid-input').value = '';
+        } else {
+            alert("❌ Error: " + res.message);
+        }
+    } catch (e) { alert("❌ Connection Error!"); }
+    
+    loader.classList.add('hidden');
+};
+</script>
+</body>
+</html>
