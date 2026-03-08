@@ -11,7 +11,6 @@ SESSION_COOKIE = ".eJyrVoovSC3KTcxLzStRsiopKk3VUSrKz0lVslIqLU4tUtIBU_GZKUpWRgZGE
 def index():
     return render_template('index.html')
 
-# UptimeRobot এর জন্য হেলথ চেক রুট
 @app.route('/health')
 def health():
     return "OK", 200
@@ -45,5 +44,6 @@ def sync_uid():
         return jsonify({"status": "error", "message": str(e)})
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5051))
+    # Render dynamic port binding fix
+    port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
