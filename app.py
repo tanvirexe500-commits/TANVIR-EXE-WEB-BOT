@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 API_BASE = "http://46.250.239.109:6001/api/uids"
-SESSION_COOKIE = ".eJyrVoovSC3KTcxLzStRsiopKk3VUSrKz0lVslIqLU4tUtIBU_GZKUpWRgZGEF5eYi5IPs-gLDE-I7VCqRYAP14XTw.aa0L4A.X9I-0xcVM1yjXODjdiHutIxSJeQ"
+SESSION_COOKIE = ".eJyrVoovSC3KTcxLzStRsiopKk3VUSrKz0lVslIqLU4tUtIBU_GZKUpWRgZGEF5eYi5IPs-gLDE-I7VCqRYAP14XTw.aa8GnQ.MTNI34CbtPZ2h-kepylUoIGVNWM"
 
 @app.route('/')
 def index():
@@ -47,3 +47,4 @@ if __name__ == '__main__':
     # Render dynamic port binding fix
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
+
