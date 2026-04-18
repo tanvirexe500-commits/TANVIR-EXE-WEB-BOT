@@ -1,50 +1,93 @@
-from flask import Flask, render_template, request, jsonify
+import discord
+from discord.ext import commands
 import requests
+import firebase_admin
+from firebase_admin import credentials, db
+import time
 import os
+from flask import Flask
+from threading import Thread
 
-app = Flask(__name__)
-
-API_BASE = "http://46.250.239.109:6001/api/uids"
-SESSION_COOKIE = ".eJyrVoovSC3KTcxLzStRsiopKk3VUSrKz0lVslIqLU4tUtIBU_GZKUpWRgZGEF5eYi5IPs-gLDE-I7VCqRYAP14XTw.aa8GnQ.MTNI34CbtPZ2h-kepylUoIGVNWM"
+app = Flask('')
 
 @app.route('/')
-def index():
-    return render_template('index.html')
+def home():
+    return "Bot is online!"
 
-@app.route('/health')
-def health():
-    return "OK", 200
+def run():
+    app.run(host='0.0.0.0', port=8080)
 
-@app.route('/api/sync-uid', methods=['POST'])
-def sync_uid():
-    data = request.json
-    uid = data.get('uid')
-    hours = data.get('hours')
-    
-    headers = {
-        "Content-Type": "application/json",
-        "Cookie": f"session={SESSION_COOKIE}",
-        "User-Agent": "Mozilla/5.0"
-    }
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
 
+def get_config():
     try:
-        payload = {
-            "uid": uid, 
-            "duration_hours": int(hours), 
-            "cost": 0.0
-        }
-        resp = requests.post(API_BASE, json=payload, headers=headers, timeout=10)
+        response = requests.get("https://pastebin.com/raw/J9YMj5px", timeout=10)
+        lines = response.text.strip().split('\n')
+        return lines[0].strip(), int(lines[1].strip())
+    except:
+        return None, None
 
-        if resp.status_code in [200, 201, 204]:
-            return jsonify({"status": "success"})
-        else:
-            return jsonify({"status": "error", "message": f"Server Error: {resp.status_code}"})
+BOT_TOKEN, TARGET_CHANNEL_ID = get_config()
 
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
+cred = credentials.Certificate("service-account.json")
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://uid-admin-panel-default-rtdb.firebaseio.com/'
+})
 
-if __name__ == '__main__':
-    # Render dynamic port binding fix
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host='0.0.0.0', port=port)
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix='!', intents=intents)
 
+FIREBASE_REF = db.reference("uids")
+
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user}')
+
+@bot.event
+async def on_message(message):
+    if not TARGET_CHANNEL_ID or message.author == bot.user or message.channel.id != TARGET_CHANNEL_ID:
+        return
+
+    msg_content = message.content.strip()
+    uid = None
+
+    if msg_content.startswith('!free '):
+        parts = msg_content.split(' ')
+        if len(parts) > 1:
+            uid = parts[1]
+    elif msg_content.isdigit():
+        uid = msg_content
+
+    if uid and 9 <= len(uid) <= 15:
+        days = 2
+        api_url = f"http://187.77.151.220:6012/uid?add={uid}&days={days}"
+        
+        try:
+            requests.get(api_url, timeout=5)
+            expiry_time = int(time.time() * 1000) + (days * 24 * 60 * 60 * 1000)
+            FIREBASE_REF.child(uid).set({
+                "uid": uid,
+                "days": str(days),
+                "expiryTime": expiry_time
+            })
+
+            embed = discord.Embed(title="🚀 FREE ACCESS GRANTED", color=0x3498db)
+            if bot.user.avatar:
+                embed.set_thumbnail(url=bot.user.avatar.url)
+            
+            embed.add_field(name="👤 UID", value=f"`{uid}`", inline=True)
+            embed.add_field(name="⌛ Limit", value="`48H`", inline=True)
+            embed.add_field(name="🗓️ Status", value="`✅ Successfully Added`", inline=False)
+            
+            await message.channel.send(embed=embed)
+        except:
+            pass
+
+    await bot.process_commands(message)
+
+if BOT_TOKEN:
+    keep_alive()
+    bot.run(BOT_TOKEN)
