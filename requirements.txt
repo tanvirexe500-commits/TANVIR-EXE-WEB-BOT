@@ -1,3 +1,5 @@
-flask
+discord.py
 requests
+firebase-admin
+flask
 gunicorn
