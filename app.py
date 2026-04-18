@@ -5,6 +5,7 @@ import firebase_admin
 from firebase_admin import credentials, db
 import time
 import os
+import json
 from flask import Flask
 from threading import Thread
 
@@ -15,7 +16,8 @@ def home():
     return "Bot is online!"
 
 def run():
-    app.run(host='0.0.0.0', port=8080)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
 
 def keep_alive():
     t = Thread(target=run)
@@ -31,7 +33,13 @@ def get_config():
 
 BOT_TOKEN, TARGET_CHANNEL_ID = get_config()
 
-cred = credentials.Certificate("service-account.json")
+firebase_json = os.environ.get("FIREBASE_JSON")
+if firebase_json:
+    service_account_info = json.loads(firebase_json)
+    cred = credentials.Certificate(service_account_info)
+else:
+    cred = credentials.Certificate("service-account.json")
+
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://uid-admin-panel-default-rtdb.firebaseio.com/'
 })
