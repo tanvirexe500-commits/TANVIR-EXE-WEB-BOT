@@ -56,7 +56,10 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if not TARGET_CHANNEL_ID or message.author == bot.user or message.channel.id != TARGET_CHANNEL_ID:
+    if message.author == bot.user:
+        return
+
+    if TARGET_CHANNEL_ID and message.channel.id != TARGET_CHANNEL_ID:
         return
 
     msg_content = message.content.strip()
