@@ -16,7 +16,7 @@ def home():
     return "Bot is online!"
 
 def run():
-    port = int(os.environ.get("PORT", 8080))
+    port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
 
 def keep_alive():
@@ -46,7 +46,7 @@ firebase_admin.initialize_app(cred, {
 
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='?', intents=intents)
 
 FIREBASE_REF = db.reference("uids")
 
@@ -96,8 +96,6 @@ async def on_message(message):
             await message.channel.send(embed=embed)
         except:
             pass
-
-    await bot.process_commands(message)
 
 if BOT_TOKEN:
     keep_alive()
