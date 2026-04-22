@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TANVIR EXE | ACCESS DECLINED</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030304;
+            background-image: 
+                radial-gradient(circle at 50% 120%, #3d0b0b 0%, #030304 60%),
+                radial-gradient(circle at 10% 10%, #1a0505 0%, transparent 20%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            overflow: hidden;
+            perspective: 1500px;
+        }
+
+        .portal-card {
+            width: 100%;
+            max-width: 380px;
+            background: rgba(15, 10, 10, 0.95);
+            border: 1px solid rgba(255, 0, 0, 0.1);
+            border-top: 3px solid #ff4757;
+            border-radius: 8px;
+            padding: 45px 35px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 71, 87, 0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        .header-section {
+            margin-bottom: 35px;
+        }
+
+        .title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 5px;
+            color: #fff;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px rgba(255, 71, 87, 0.3);
+        }
+
+        .status-tags {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .tag {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            background: rgba(255, 0, 0, 0.05);
+            border: 1px solid rgba(255, 71, 87, 0.2);
+            border-radius: 4px;
+            color: #ff4757;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 11px;
+            letter-spacing: 1.8px;
+        }
+
+        .input-box {
+            width: 100%;
+            background: rgba(20, 10, 10, 0.6);
+            border: 1px solid #331111;
+            padding: 16px 20px;
+            color: #666;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: not-allowed;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .action-btn {
+            width: 100%;
+            background: #222;
+            color: #555;
+            border: 2px solid #333;
+            padding: 17px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: not-allowed;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn span {
+            position: relative;
+            z-index: 2;
+        }
+
+        .decline-overlay {
+            color: #ff4757;
+            font-weight: 700;
+            margin-top: 15px;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 2px;
+            font-size: 14px;
+            text-transform: uppercase;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .card-footer {
+            margin-top: 35px;
+        }
+
+        .footer-note {
+            font-size: 11px;
+            color: #444;
+            line-height: 1.8;
+        }
+
+        .scan-line {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 71, 87, 0.3), transparent);
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: scanning 4s linear infinite;
+        }
+
+        @keyframes scanning {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="portal-card">
+    <div class="scan-line"></div>
+    
+    <div class="header-section">
+        <h1 class="title">TANVIR EXE</h1>
+        <div class="status-tags">
+            <span class="tag">● System Offline</span>
+            <span class="tag">Global v4.0</span>
+        </div>
+    </div>
+
+    <form onsubmit="return false;">
+        <div class="form-group">
+            <label>Authentication UID</label>
+            <input type="text" class="input-box" placeholder="Access Restricted" readonly>
+        </div>
+
+        <button type="button" class="action-btn">
+            <span>FREE ACCESS DECLINE</span>
+        </button>
+    </form>
+
+    <div class="decline-overlay">Trial Period Terminated</div>
+
+    <div class="card-footer">
+        <p class="footer-note">
+            Public distribution for this version has ended. <br>
+            Please contact the administrator for private access.
+        </p>
+    </div>
+</div>
+<script>
+(function () {
+  'use strict';
+  function isEditableTarget(el) {
+    if (!el || el.nodeType !== 1) return false;
+    const tag = el.tagName;
+    if (tag === 'TEXTAREA') return true;
+    if (tag === 'INPUT') {
+      const t = (el.type || '').toLowerCase();
+      return !['button', 'checkbox', 'radio', 'submit', 'reset', 'file', 'hidden'].includes(t);
+    }
+    return el.isContentEditable === true;
+  }
+  function stop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+  var DEVTOOL_CODES = { KeyI: 1, KeyJ: 1, KeyC: 1, KeyK: 1, KeyM: 1, KeyP: 1, KeyE: 1 };
+  document.addEventListener('keydown', function (e) {
+      if (isEditableTarget(e.target)) {
+        var k = (e.key || '').toLowerCase();
+        if ((e.ctrlKey || e.metaKey) && ['c', 'v', 'x', 'a'].includes(k)) return;
+      }
+      if (e.key === 'F12' || e.keyCode === 123) return stop(e);
+      if (e.shiftKey && (e.key === 'F10' || e.code === 'F10')) return stop(e);
+      var mod = e.ctrlKey || e.metaKey;
+      var code = e.code || '';
+      if (mod && e.shiftKey && !e.altKey && DEVTOOL_CODES[code]) return stop(e);
+      if (code === 'Backquote') {
+        if (e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) return stop(e);
+        if (e.ctrlKey && !e.metaKey && e.shiftKey) return stop(e);
+      }
+      if (e.metaKey && e.altKey) {
+        if (['KeyI', 'KeyJ', 'KeyC', 'KeyU'].indexOf(code) !== -1) return stop(e);
+      }
+      if (mod && !e.shiftKey && !e.altKey) {
+        if (code === 'KeyU' || code === 'KeyS') return stop(e);
+      }
+      if (mod && e.shiftKey && code === 'KeyU') return stop(e);
+    }, true);
+  document.addEventListener('contextmenu', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }, true);
+  document.addEventListener('mousedown', function (e) {
+      if (e.button === 2) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+})();
+</script>
+</body>
+</html>
