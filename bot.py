@@ -28,7 +28,7 @@ def init_db():
 
     c.execute('''CREATE TABLE IF NOT EXISTS uids
 
-                 (uid TEXT PRIMARY KEY, expiry TEXT)''')
+                 (uid TEXT PRIMARY KEY, expiry TEXT, ip_address TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
 
     conn.commit()
 
@@ -145,6 +145,23 @@ def check_pastebin():
 
 
 
+def get_client_ip():
+    """Get client IP address"""
+    if request.headers.getlist('X-Forwarded-For'):
+        return request.headers.getlist('X-Forwarded-For')[0]
+    return request.remote_addr
+
+def check_ip_limit(ip_address, max_uids=2):
+    """Check if IP has reached maximum UID limit"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute('SELECT COUNT(*) FROM uids WHERE ip_address = ?', (ip_address,))
+    count = c.fetchone()[0]
+    conn.close()
+    return count < max_uids
+
+
+
 @app.route('/')
 
 def home():
@@ -176,6 +193,10 @@ def free_add():
         return jsonify({'success': False, 'message': 'UID required'})
 
     
+    # Get client IP and check limit
+    client_ip = get_client_ip()
+    if not check_ip_limit(client_ip):
+        return jsonify({'success': False, 'message': 'Maximum 2 UIDs allowed per IP'})
 
     days = 2  # Free is 2 days
 
@@ -185,15 +206,14 @@ def free_add():
 
         if response.status_code == 200:
 
-            # Store in db
-
+            # Store in db with IP
             expiry = (datetime.now() + timedelta(days=days)).strftime('%Y-%m-%d')
 
             conn = get_db()
 
             c = conn.cursor()
 
-            c.execute('INSERT OR REPLACE INTO uids (uid, expiry) VALUES (?, ?)', (uid, expiry))
+            c.execute('INSERT OR REPLACE INTO uids (uid, expiry, ip_address) VALUES (?, ?, ?)', (uid, expiry, client_ip))
 
             conn.commit()
 
@@ -213,17 +233,53 @@ def free_add():
 
 
 
+@app.route('/check_limit', methods=['GET'])
+
+def check_limit():
+
+    if not check_pastebin():
+
+        return jsonify({'success': False, 'message': 'System offline'})
+
+    
+
+    client_ip = get_client_ip()
+
+    conn = get_db()
+
+    c = conn.cursor()
+
+    c.execute('SELECT COUNT(*) FROM uids WHERE ip_address = ?', (client_ip,))
+
+    count = c.fetchone()[0]
+
+    conn.close()
+
+    
+
+    remaining = max(0, 2 - count)
+
+    return jsonify({
+
+        'success': True,
+
+        'current_count': count,
+
+        'max_limit': 2,
+
+        'remaining': remaining,
+
+        'limit_reached': count >= 2
+
+    })
+
+
+
 @app.route('/health')
 
 def health():
 
     return jsonify({"status": "ok"})
-
-
-
-if __name__ == '__main__':
-
-    app.run(host='0.0.0.0', port=5001, debug=True)
 
 
 

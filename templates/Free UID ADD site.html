@@ -124,6 +124,36 @@
             transform: translateY(-2px);
         }
 
+        .action-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .pulse-animation {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
         #notification {
             position: fixed;
             top: 20px;
@@ -158,6 +188,7 @@
             100% { top: 100%; }
         }
 
+        
         .footer-note {
             margin-top: 30px;
             font-size: 11px;
@@ -187,7 +218,7 @@
             <input type="text" id="uidInput" class="input-box" placeholder="Enter Your Uid" autocomplete="off">
         </div>
 
-        <button type="submit" class="action-btn">
+        <button type="submit" class="action-btn" id="submitBtn">
             <span>START EXECUTION</span>
         </button>
     </form>
@@ -257,16 +288,53 @@
     const form = document.getElementById('accessForm');
     const input = document.getElementById('uidInput');
     const notify = document.getElementById('notification');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Check limit on page load
+    function checkLimit() {
+        fetch('/check_limit')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateInputState(data);
+                }
+            })
+            .catch(error => {
+                console.error('Error checking limit:', error);
+            });
+    }
+
+    function updateInputState(data) {
+        if (data.limit_reached) {
+            input.disabled = true;
+            input.placeholder = 'Limit reached - cannot add more UIDs';
+            submitBtn.disabled = true;
+        } else {
+            input.disabled = false;
+            input.placeholder = 'Enter Your Uid';
+            submitBtn.disabled = false;
+        }
+    }
+
+    // Check limit on page load
+    checkLimit();
 
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         const uidValue = input.value.trim();
+        const submitBtn = form.querySelector('.action-btn');
+        
         if (uidValue.length < 9 || uidValue.length > 15) {
             notify.classList.add('show');
             setTimeout(() => {
                 notify.classList.remove('show');
             }, 3000);
         } else {
+            // Show spinner and disable button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span>PROCESSING...';
+            submitBtn.classList.add('pulse-animation');
+            
             // Submit to server
             fetch('/free_add', {
                 method: 'POST',
@@ -277,14 +345,25 @@
             })
             .then(response => response.json())
             .then(data => {
+                // Reset button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>START EXECUTION</span>';
+                submitBtn.classList.remove('pulse-animation');
+                
                 if (data.success) {
                     showSuccessNotification(uidValue);
                     input.value = '';
+                    // Refresh limit status after successful addition
+                    checkLimit();
                 } else {
                     showErrorNotification(data.message || 'Failed to add UID');
                 }
             })
             .catch(error => {
+                // Reset button on error
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>START EXECUTION</span>';
+                submitBtn.classList.remove('pulse-animation');
                 showErrorNotification('Network error');
             });
         }
