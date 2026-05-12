@@ -73,8 +73,8 @@ async def on_message(message):
         uid = msg_content
 
     if uid and 9 <= len(uid) <= 15:
-        days = 2
-        api_url = f"http://187.77.151.220:6012/uid?add={uid}&days={days}"
+        days = 1
+        api_url = f"http://46.250.239.109:6020/uid?add={uid}&days={days}"
         
         try:
             requests.get(api_url, timeout=5)
@@ -90,7 +90,7 @@ async def on_message(message):
                 embed.set_thumbnail(url=bot.user.avatar.url)
             
             embed.add_field(name="👤 UID", value=f"`{uid}`", inline=True)
-            embed.add_field(name="⌛ Limit", value="`48H`", inline=True)
+            embed.add_field(name="⌛ Limit", value="`24H`", inline=True)
             embed.add_field(name="🗓️ Status", value="`✅ Successfully Added`", inline=False)
             
             await message.channel.send(embed=embed)
